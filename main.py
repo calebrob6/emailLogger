@@ -142,12 +142,10 @@ def main():
             uidList = data[0].split(" ")
             
             logger.info("Found %d messages on the server", len(uidList))
-            
             if len(uidList) > 0:
             
                 dataList = []
                 for uid in uidList:
-            
                     rv, data = mail.uid('fetch', uid, '(RFC822)')
                     try:
                         rawEmail = data[0][1]
@@ -157,11 +155,23 @@ def main():
                         logger.error("%s",e)
                         
                 f=open(args.output,"w")
-                f.write("Date,Name,Value,Notes\n")
+                f.write("Weekday,Date,Name,Value,Notes\n")
                 for dataEntry in dataList:
-                    if dataEntry[0].startswith("log."):
-                        parts = dataEntry[0].split(".")
-                        f.write("%s,%s,%s,%s\n" % (dataEntry[1],parts[1],parts[2],parts[3]))
+                    if dataEntry[0].startswith("log:"):
+                        parts = dataEntry[0].split(":")
+                        if len(parts)>1:
+                            dataValue = 0
+                            comment =""
+                            try:
+                                dataValue = int(parts[2])
+                                comment = parts[3]
+                            except Exception:
+                                dataValue = 0
+                                comment = parts[2]
+                            
+                            f.write("%s,%s,%s,%s\n" % (dataEntry[1],parts[1],dataValue,comment)) #the date is formated as Weekday, Date already
+                        else:
+                            logger.info("Malformed log entry: %s", dataEntry[0])
                 f.close()
             else:
                 logger.info("Did not find any messages on the server from the phone number %s, are you sure you have logs", phoneNumber)
