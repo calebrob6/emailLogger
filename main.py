@@ -161,15 +161,18 @@ def main():
                         parts = dataEntry[0].split(":")
                         if len(parts)>1:
                             dataValue = 0
-                            comment =""
+                            comment = ""
                             try:
                                 dataValue = int(parts[2])
                                 comment = parts[3]
                             except Exception:
-                                dataValue = 0
-                                comment = parts[2]
-                            
-                            f.write("%s,%s,%s,%s\n" % (dataEntry[1],parts[1],dataValue,comment)) #the date is formated as Weekday, Date already
+                                try:
+                                    dataValue = 0
+                                    comment = parts[2]
+                                except Exception:
+                                    dataValue = 0
+                                    comment = ""
+                            f.write("%s,%s,%d,%s\n" % (dataEntry[1],parts[1],dataValue,comment)) #the date is formated as Weekday, Date already
                         else:
                             logger.info("Malformed log entry: %s", dataEntry[0])
                 f.close()
