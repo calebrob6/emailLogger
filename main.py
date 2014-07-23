@@ -1,7 +1,7 @@
 '''
 Created on Jul 23, 2014
 
-@author: drobinson
+@author: calebrob6
 '''
 
 import sys
@@ -95,6 +95,7 @@ def main():
     parser.add_argument("-p", "--password", help="GMail password")
     parser.add_argument("-d", "--days", help="Days back to search for logs", type=int, default=7)
     parser.add_argument("--phone", help="Phone number that sends the logs")
+    parser.add_argument("-o","--output", help="Output file to generate", default="out.csv")
     args = parser.parse_args()
     
     emailAddress = args.email
@@ -155,7 +156,13 @@ def main():
                         logger.error("Error processing message for uid=%s", uid)
                         logger.error("%s",e)
                         
-                print dataList
+                f=open(args.output,"w")
+                f.write("Date,Name,Value,Notes\n")
+                for dataEntry in dataList:
+                    if dataEntry[0].startswith("log."):
+                        parts = dataEntry[0].split(".")
+                        f.write("%s,%s,%s,%s\n" % (dataEntry[1],parts[1],parts[2],parts[3]))
+                f.close()
             else:
                 logger.info("Did not find any messages on the server from the phone number %s, are you sure you have logs", phoneNumber)
         else:
