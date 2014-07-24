@@ -27,7 +27,7 @@ DEVMODE = True
 
 def initializeLogger(output_dir):
     logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
      
     # create console handler and set level to info
     handler = logging.StreamHandler()
@@ -157,13 +157,13 @@ def main():
                 f=open(args.output,"w")
                 f.write("Weekday,Date,Name,Value,Notes\n")
                 for dataEntry in dataList:
-                    if dataEntry[0].startswith("log:"):
+                    if dataEntry[0].lower().startswith("log:"):
                         parts = dataEntry[0].split(":")
                         if len(parts)>1:
                             dataValue = 0
                             comment = ""
                             try:
-                                dataValue = int(parts[2])
+                                dataValue = float(parts[2])
                                 comment = parts[3]
                             except Exception:
                                 try:
