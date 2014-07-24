@@ -1,13 +1,11 @@
 emailLogger
 ===========
 
-Send SMS messages to your gmail account in the form log:[Type of log]:[Data value (optional)]:[Note] and this program will parse them into a csv file
+Send SMS messages to your gmail account in the form log:[Type of log]:[Data value (optional)]:[Note (optional)] and this program will parse them into a csv file
 
-Example: log:pushups:30:Got very sore
-
-Example: log:woke up
-
-Example: log:pushups:100
+Example: log:pushups:30:Got very sore  
+Example: log:woke up  
+Example: log:pushups:100  
 
 You will need to double check you email account to see what format your SMS texts are recieved. This program does an imap search for any emails with the phone number you input as a substring. 
 It expects that the message body will contain your text.
@@ -32,7 +30,6 @@ optional arguments:
 
   
 If the -c flag is present the program will look for a config.txt that contains 3 lines in the form:
-
 ```
 email
 password
