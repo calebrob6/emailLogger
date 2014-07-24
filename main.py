@@ -4,26 +4,20 @@ Created on Jul 23, 2014
 @author: calebrob6
 '''
 
-import sys
-import os
+import argparse
+import datetime
+import email.utils
 import getpass
 import imaplib
-import datetime
-
-import argparse
 import logging
-
-import email
-import email.header
-import email.utils
+import os
+import sys
 
 
 BOX_GMAIL_ALL = "[Gmail]/All Mail"
 BOX_GMAIL_INBOX = "Inbox"
 
 LOG_TO_FILE = False
-
-DEVMODE = True
 
 def initializeLogger(output_dir):
     logger = logging.getLogger()
@@ -96,31 +90,36 @@ def main():
     parser.add_argument("-d", "--days", help="Days back to search for logs", type=int, default=7)
     parser.add_argument("--phone", help="Phone number that sends the logs")
     parser.add_argument("-o","--output", help="Output file to generate", default="out.csv")
+    parser.add_argument("-c", "--useConfig", help="Uses the config file if available (see README for details)", action="store_true")
     args = parser.parse_args()
     
     emailAddress = args.email
     emailPassword = args.password
     phoneNumber = args.phone
-    
-    if args.email == None:
-        logger.debug("An email address was not specified on the command line")
-        emailAddress = raw_input("Enter your email address: ").strip()
-    if args.password == None:
-        logger.debug("An email password was not specified on the command line")
-        emailPassword = getpass.getpass("Enter your password: ")
-    if args.phone == None:
-        logger.debug("A phone number was not specified on the command line")
-        phoneNumber = raw_input("Enter your phone number: ").strip()
 
     
-    if DEVMODE:
+    if args.useConfig:
         if os.path.isfile("config.txt"):
-            f=open("config.txt","r")
-            emailAddress = f.readline().strip()
-            emailPassword = f.readline().strip()
-            phoneNumber = f.readline().strip()
-            f.close()
-    
+            try:
+                f=open("config.txt","r")
+                emailAddress = f.readline().strip()
+                emailPassword = f.readline().strip()
+                phoneNumber = f.readline().strip()
+                f.close()
+            except Exception:
+                logger.error("Error reading in the configuration, fix the config file, exiting")
+                return 1
+            
+    if emailAddress == None:
+        logger.debug("An email address was not specified on the command line")
+        emailAddress = raw_input("Enter your email address: ").strip()
+    if emailPassword == None:
+        logger.debug("An email password was not specified on the command line")
+        emailPassword = getpass.getpass("Enter your password: ")
+    if phoneNumber == None:
+        logger.debug("A phone number was not specified on the command line")
+        phoneNumber = raw_input("Enter your phone number: ").strip()
+            
     mail = imaplib.IMAP4_SSL('imap.gmail.com')
     try:
         logger.debug("Trying to login with email address: %s, and password: %s",emailAddress,emailPassword)
@@ -141,9 +140,9 @@ def main():
         if rv == 'OK':
             uidList = data[0].split(" ")
             
-            logger.info("Found %d messages on the server", len(uidList))
-            if len(uidList) > 0:
             
+            if len(uidList) > 1:
+                logger.info("Found %d messages on the server", len(uidList))
                 dataList = []
                 for uid in uidList:
                     rv, data = mail.uid('fetch', uid, '(RFC822)')

@@ -23,3 +23,10 @@ optional arguments:
   --phone PHONE         Phone number that sends the logs
   -o OUTPUT, --output OUTPUT
                         Output file to generate
+  -c, --useConfig       Uses the config file if available
+  
+  
+  If the -c flag is present the program will look for a config.txt that contains 3 lines in the form:
+  `email`
+  `password`
+  `phonenumber`
